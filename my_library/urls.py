@@ -20,6 +20,7 @@ from django.urls import path
 from loans import views
 
 urlpatterns = [
+    path('', views.welcome, name='root'),
     path('welcome/', views.welcome, name='welcome'),
     path('books/', views.books, name='books'), # path to view all books in the DB
     path('books/<int:book_id>', views.get_book, name='get_book'), # Path to view a chosen book in the DB by its primary_key
