@@ -1,0 +1,18 @@
+<!-- This page displays a form with filled in details about the chosen book-->
+<!-- The user can update the fields and press save to save the changes to the DB-->
+<!-- This action does not create a new book but updates an existing book-->
+{% extends "base_page.html"%}
+
+{% block title %}
+My Library | Update Book
+{% endblock %}
+
+{% block content %}
+<h1>update a book</h1>
+<p>you have made a request to update a book with book_id: {{book_id}}</p>
+
+<form action="{% url 'update_book' book_id %}", method="post">
+    {% include "__book_form.html" with form=form submit_btn_name="update"%}
+</form>
+
+{% endblock %}

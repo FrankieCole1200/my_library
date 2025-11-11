@@ -1,0 +1,20 @@
+<!-- This page displays a book from the database-->
+<!-- The book should have a link to take it to the books.html page to see all the books in the DB-->
+
+{% extends "base_page.html"%}
+
+{% block title %}
+My Library | Book
+{% endblock %}
+
+{% block content %}
+<p>you have made a request for book with book_id: {{book_id}}</p>
+<p><i>
+    Book Title: {{requested_book.title}}
+    Author: {{requested_book.authors}}
+    published: {{requested_book.publication_date}}
+    isbn: {{requested_book.isbn}}
+
+    <a href={% url 'books' %}>Go to list of all books</a>
+</i></p>
+{% endblock %}
