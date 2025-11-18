@@ -1,0 +1,7 @@
+{%if book.image %}
+
+<img src="{{book.image.url}}" width = 50/> 
+
+{% endif %}
+
+{{book.title}} {{book.authors}}, published: {{book.publication_date}}, {{book.isbn}}

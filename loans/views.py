@@ -6,6 +6,14 @@ from loans.models import Book
 from django.http import Http404
 from loans.forms import BookForm
 
+from django.core.paginator import Paginator
+
+from django.contrib import messages
+
+from django.views import View
+
+ITEMS_PER_PAGE = 25
+
 # Create your views here.
 def welcome(request):
     slogans = [
@@ -23,8 +31,11 @@ def welcome(request):
     return render(request, 'welcome.html', context)
 
 def books(request):
-    allBooks = Book.objects.all() # gives us a list of books in the DB
-    context = {'books': allBooks}
+    allBooks = Book.objects.all().order_by('id') # gives us a list of books in the DB
+    paginator = Paginator(allBooks, ITEMS_PER_PAGE)
+    page_number = request.GET.get("page")
+    page_object = paginator.get_page(page_number)
+    context = {'page_object': page_object}
     return render(request, 'books.html', context)
 
 
@@ -43,15 +54,14 @@ def get_bookv2(request, book_id):
     bar = request.GET.get('bar', 0)
     return HttpResponse(f"You're requesting book with book_id {book_id}, foo={foo}, bar{bar}")
 
-
-def create_book(request):
-    # checks to see if the request is a POST request which means we are recieving a form from the browser
-    if request.method == "POST":
+class CreateBookView(View):
+    def get(self, request):
+        form = BookForm()
+        return render(request, 'create_book.html', {'form': form})
+    
+    def post(self, request):
         form = BookForm(request.POST)
-        # make sure all the data is of the correct type
-        # if it is invalid the code skips to the end and we show another blank form but this time with error messages
         if form.is_valid():
-            # save the book to the DB#
             try:
                 form.save()
             except:
@@ -59,9 +69,8 @@ def create_book(request):
             else:
                 path = reverse('books')
                 return HttpResponseRedirect(path)
-    else: # if the request is a GET request which means the user wants to enter a form
-        form = BookForm() # display a blank form
-    return render(request, 'create_book.html', {'form': form})
+        return render(request, 'create_book.html', {'form': form})
+
 
 
 def update_book(request, book_id):
@@ -73,14 +82,15 @@ def update_book(request, book_id):
     
     # check to see if we have a POST request we want to update the existing Book in the DB
     if request.method == "POST":
-        form = BookForm(request.POST, instance=requested_book) # create a bounded form
+        form = BookForm(request.POST, request.FILES, instance=requested_book) # create a bounded form
         # check the form is valid
         if form.is_valid():
             try:
-                form.save()
+                book = form.save()
             except:
                 form.add_error(None, "It was not possible to save this book")
             else:
+                messages.info(request, f"Updated book record to: {book}")
                 path = reverse('books')
                 return HttpResponseRedirect(path)
     else: # if request is GET we need to show the form to the user
@@ -88,11 +98,12 @@ def update_book(request, book_id):
         context = {'book_id': book_id, 'form': form}
         return render(request, 'update_book.html', context)
 
+
 def delete_book(request, book_id):
     # check if we have a valid book_id
     try:
         requested_book = Book.objects.get(pk=book_id)
-    except Book.DoesNotExist: # 404 error if the book id is non exisitent in the DB
+    except Book.DoesNotExist: # 404 error if the book id is non existent in the DB
         raise Http404(f"Could not find book with primary key {book_id}")
     
     if request.method == "POST":

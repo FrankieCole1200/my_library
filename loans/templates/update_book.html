@@ -11,7 +11,7 @@ My Library | Update Book
 <h1>update a book</h1>
 <p>you have made a request to update a book with book_id: {{book_id}}</p>
 
-<form action="{% url 'update_book' book_id %}", method="post">
+<form action="{% url 'update_book' book_id %}", method="post", enctype="multipart/form-data">
     {% include "__book_form.html" with form=form submit_btn_name="update"%}
 </form>
 

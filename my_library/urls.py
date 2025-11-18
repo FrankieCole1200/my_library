@@ -19,14 +19,19 @@ from django.urls import path
 
 from loans import views
 
+from django.conf.urls.static import static
+from django.conf import settings
+
 urlpatterns = [
     path('', views.welcome, name='root'),
     path('welcome/', views.welcome, name='welcome'),
     path('books/', views.books, name='books'), # path to view all books in the DB
     path('books/<int:book_id>', views.get_book, name='get_book'), # Path to view a chosen book in the DB by its primary_key
     #path('books/<int:book_id>/params', views.get_bookv2, name='get_bookv2'), # uses parameters e.g. ?foo=2&bar=5
-    path('create_book/', views.create_book, name='create_book'),
+    path('create_book/', views.CreateBookView.as_view(), name='create_book'),
     path('update_book/<int:book_id>', views.update_book, name='update_book'),
     path('delete_book/<int:book_id>', views.delete_book, name='delete_book'),
     path('admin/', admin.site.urls)
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
